@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{{ welcome }}
+<p>
+<form action="" method="post">
+    {% csrf_token %}
+    <label for="keyword" >请输入书名</label>
+    {{ form.keyword}}
+    <input type="submit" value="搜索" />
+</form>
+</p>
+
+<p>
+    {% if books %}
+    <ul>
+    {%  for book in books%}
+        {% if book.state == 0  %}
+            <li>书名：{{  book.bookName }}</li>
+            <li>id: {{ book.id }}</li>
+            <li>现在可以外借，请携带学生证到电院群楼3-102借阅此书</li>
+        {% endif %}
+        <hr/>
+    {%  endfor %}
+    {% endif %}
+    </ul>
+{{ warning }}
+{% if borrows %}
+    <ul>
+   {%  for borrow in borrows%}
+            <li>书名：{{  borrow.currentBook.bookName }}</li>
+            <li>id: {{ borrow.currentBook.id }} </li>
+            <li>借书日期: {{ borrow.borrowDate|date:"Y-m-d" }}</li>
+            <li>此书已被借，到期时间为: {{ borrow.shouldBackDate|date:"Y-m-d" }}</li>
+        <hr/>
+    {%  endfor %}
+    {% endif %}
+    </ul>
+</p>
+</body>
+</html>
+{% endblock %}
