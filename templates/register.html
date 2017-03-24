@@ -1,0 +1,32 @@
+{% block content %}
+
+<h2>用户注册</h2>
+        <section>
+            <form action="" method="post">
+                {% csrf_token %}
+                <h4>register a new account.</h4>
+
+                <hr />
+                    <label for="id_username" >用户名</label>
+                        {{form.username}} {{form.username.errors}}<br/><br/>
+                    <label for="id_email" >e-mail</label>
+                        {{form.email}} {{form.email.errors}}<br/><br/>
+                    <label for="id_xuehao" >学号</label>
+                        {{ form.xuehao }}<br/><br/>
+                    <label for="id_banji" >班级</label>
+                        {{ form.banji}}<br/><br/>
+                    <label for="id_wecaht" >微信</label>
+                        {{ form.wechat }}<br/><br/>
+                    <label for="id_phoneNumber" >手机号</label>
+                        {{ form.phoneNumber }}<br/><br/>
+                    <label for="id_password" >密码</label>
+                        {{form.password1}} {{form.password1.errors}}<br/><br/>
+                    <label for="id_password" >确认密码</label>
+                        {{form.password2}}  {{form.password2.errors}}<br/><br/>
+                        <input type = 'submit'  value="Submit" />
+                {% for items in errors %}
+                <p > {{items}} </p>
+                {% endfor %}
+            </form>
+        </section>
+{% endblock %}

@@ -6,7 +6,18 @@
     <title>Title</title>
 </head>
 <body>
-{{ welcome }}
+{% if user.is_authenticated %}
+<form id="logoutForm" action="/logout" method="post" >
+    {% csrf_token %}
+        <li>您好 {{ user.username }}! <a href="javascript:document.getElementById('logoutForm').submit()">登出</a></li>
+
+</form>
+
+{% else %}
+    <li><a href="/login">登录</a><a href="/register">注册</a></li>
+
+{% endif %}
+
 <p>
 <form action="" method="post">
     {% csrf_token %}
@@ -15,7 +26,6 @@
     <input type="submit" value="搜索" />
 </form>
 </p>
-
 <p>
     {% if books %}
     <ul>

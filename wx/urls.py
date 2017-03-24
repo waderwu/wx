@@ -13,12 +13,33 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+from datetime import datetime
 from django.conf.urls import url
 from django.contrib import admin
+import django.contrib.auth.views
 import piaoliu.views
+import piaoliu.forms
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$',piaoliu.views.index),
-    url(r'^register/',piaoliu.views.register)
+    url(r'^register/',piaoliu.views.register),
+    url(r'^logout$',
+        django.contrib.auth.views.logout,
+        {
+            'next_page': '/',
+        },
+        name='logout'),
+    url(r'^login/$',
+        django.contrib.auth.views.login,
+        {
+            'template_name': 'login.html',
+            'authentication_form': piaoliu.forms.BootstrapAuthenticationForm,
+            'extra_context':
+                {
+                    'title': 'Log in',
+                    'year': datetime.now().year,
+                }
+        },
+        name='login'),
 ]
