@@ -34,3 +34,8 @@ orderBook 关于预约的一张表
 包括的属性有：
 所预约的书，所对应的用户，预约时间，是否已经借了书
 
+# 遇到的问题及其解决方法
+http://stackoverflow.com/questions/1355150/django-when-saving-how-can-you-check-if-a-field-has-changed
+
+http://stackoverflow.com/questions/573618/django-set-up-a-scheduled-job
+

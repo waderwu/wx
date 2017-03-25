@@ -24,7 +24,7 @@ class StudentAdmin(admin.ModelAdmin):
     #fields = ('id', 'userid', 'xuehao', 'banji', 'name', 'phoneNumber', 'email', 'wechat')
     list_display = ('id','userid','xuehao','banji','user','email','phoneNumber','wechat','amount')
     search_fields = ('user__username', 'xuehao','banji','phoneNumber')
-    inlines = [BorrowBookInline,orderBookInline]
+    inlines = [BorrowBookInline,]
 
 
 admin.site.register(Student,StudentAdmin)
@@ -37,7 +37,7 @@ class BookAdmin(admin.ModelAdmin):
         return amount
     list_display = ('id','bookName','length','description','isbn','state','borrowed')
     #可以在book的页面编辑borrowBook
-    inlines = [BorrowBookInline,orderBookInline]
+    inlines = [BorrowBookInline,]
 admin.site.register(Book,BookAdmin)
 
 class BorrowBookAdmin(admin.ModelAdmin):

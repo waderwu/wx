@@ -1,10 +1,12 @@
-from datetime import datetime
+from datetime import datetime,timedelta
 from django.shortcuts import render
 from django.http import HttpResponse,HttpResponseRedirect
 from piaoliu.models import Student ,Book , BorrowBook
 from django.contrib.auth.models import User
 from django.contrib import auth
+#从本目录下导入
 import piaoliu.forms
+from piaoliu.notice import back_notice,order_notice
 
 # Create your views here.
 
@@ -88,5 +90,25 @@ def register(request):
         return render(request, "register.html",{'form':form,'title':'注册','year':datetime.now().year})
 
     return render(request, "register.html")
+
+def check(request):
+    #try:
+        token = request.GET['token']
+        if token=='laoshijiushiyaojiancha':
+            jieyues = BorrowBook.objects.all()
+            for jieyue in jieyues:
+                #type is <class 'datetime.date'> but datetime.today() is <class 'datetime.datetime'>
+                today = datetime.today().date()
+                #dela = jieyue.shouldBackDate()-today
+                #print (type(dela))
+                if (jieyue.shouldBackDate().strftime('%Y-%m-%d')=='2017-04-24'):
+                    back_notice(jieyue)
+                    print ('true')
+                print (jieyue.shouldBackDate().strftime('%Y-%m-%d'))
+
+            return HttpResponse('ok')
+        return HttpResponse('error')
+    #except:
+    #   return HttpResponse('forbidden')
 
 

@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$',piaoliu.views.index),
     url(r'^register/',piaoliu.views.register),
+    url(r'^check/',piaoliu.views.check),
     url(r'^logout$',
         django.contrib.auth.views.logout,
         {
