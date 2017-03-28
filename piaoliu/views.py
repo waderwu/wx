@@ -1,7 +1,7 @@
 from datetime import datetime,timedelta
 from django.shortcuts import render
 from django.http import HttpResponse,HttpResponseRedirect
-from piaoliu.models import Student ,Book , BorrowBook
+from piaoliu.models import Student ,Book , BorrowBook , orderBook
 from django.contrib.auth.models import User
 from django.contrib import auth
 #从本目录下导入
@@ -90,7 +90,24 @@ def register(request):
         return render(request, "register.html",{'form':form,'title':'注册','year':datetime.now().year})
 
     return render(request, "register.html")
+def order(request,bookid):
+    if request.user.is_authenticated:
+        book = Book.objects.get(id=bookid)
+        user = request.user.student
+        order = orderBook.objects.create(book=book,user=user)
+        order.save()
+        return HttpResponseRedirect('/detail/')
+    else:
+        return HttpResponseRedirect('/login/')
 
+def detail(request):
+    if request.user.is_authenticated:
+        user = request.user.student
+        borrowbooks = BorrowBook.objects.filter(currentUser=user)
+        orderbooks = orderBook.objects.filter(user=user)
+        return render(request,"detail.html",{'borrowbooks':borrowbooks,"orderbooks":orderbooks})
+    else:
+        return HttpResponseRedirect('login/')
 def check(request):
     #try:
         token = request.GET['token']

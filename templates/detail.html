@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>detail</title>
+</head>
+<body>
+<h1>借的书</h1>
+{% if borrowbooks %}
+    <ul>
+    <h2>还未还的书</h2>
+   {%  for borrow in borrowbooks%}
+       {% if borrow.status == "未还" %}
+            <li>书名：{{  borrow.currentBook.bookName }}</li>
+            <li>id: {{ borrow.currentBook.id }} </li>
+            <li>借书日期: {{ borrow.borrowDate|date:"Y-m-d" }}</li>
+            <li>到期时间为: {{ borrow.shouldBackDate|date:"Y-m-d" }}</li>
+        <hr/>
+       {% endif %}
+    {%  endfor %}
+    <hr/>
+    <h2>已经还的书</h2>
+    {%  for borrow in borrowbooks%}
+       {% if borrow.status == "已还" %}
+            <li>书名：{{  borrow.currentBook.bookName }}</li>
+            <li>id: {{ borrow.currentBook.id }} </li>
+            <li>借书日期: {{ borrow.borrowDate|date:"Y-m-d" }}</li>
+            <li>还书时间: {{ borrow.actualBackDate|date:"Y-m-d" }}</li>
+        <hr/>
+       {% endif %}
+    {%  endfor %}
+    {% endif %}
+<h1>预约的书</h1>
+
+<hr/>
+    {% if orderbooks %}
+    <ul>
+   {%  for order in orderbooks%}
+            <li>书名：{{  order.book.bookName }}</li>
+            <li>id: {{ order.book.id }} </li>
+            <li>预约日期: {{ order.orderDate|date:"Y-m-d" }}</li>
+        <hr/>
+    {%  endfor %}
+    {% endif %}
+    </ul>
+</body>
+</html>

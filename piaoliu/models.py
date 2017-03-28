@@ -98,4 +98,6 @@ class orderBook(models.Model):
     user = models.ForeignKey(Student)
     # 0代表还没有拿书，1代表已经拿书了
     state = models.CharField(max_length=10,default=0)
+    #是否已经通知 0 代表未通知 1代表已经通知，2 代表通知了但是未来拿
+    noticeState = models.IntegerField(default=0)
 

@@ -25,6 +25,8 @@ urlpatterns = [
     url(r'^$',piaoliu.views.index),
     url(r'^register/',piaoliu.views.register),
     url(r'^check/',piaoliu.views.check),
+    url(r'^order/(?P<bookid>\d)/',piaoliu.views.order),
+    url(r'^detail/',piaoliu.views.detail),
     url(r'^logout$',
         django.contrib.auth.views.logout,
         {
