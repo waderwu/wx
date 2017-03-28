@@ -31,18 +31,19 @@ admin.site.register(Student,StudentAdmin)
 
 
 class BookAdmin(admin.ModelAdmin):
+    #显示这本书被借了多少次
     def borrowed(self,obj):
         book = obj.borrowbook_set.all()
         amount = book.count()
         return amount
-    list_display = ('id','bookName','length','description','isbn','state','borrowed')
+    list_display = ('id','bookName','length','description','isbn','status','borrowed')
     #可以在book的页面编辑borrowBook
     inlines = [BorrowBookInline,]
 admin.site.register(Book,BookAdmin)
 
 class BorrowBookAdmin(admin.ModelAdmin):
-    empty_value_display = '未还'
-    list_display = ('id','currentBook','link_to_book','currentUser','link_to_user','borrowDate','actualBackDate')
+    #empty_value_display = '未还'
+    list_display = ('id','currentBook','link_to_book','currentUser','link_to_user','borrowDate','actualBackDate','status')
     #增加之后链接到可改变的页面
     #list_display_links = ('borrowDate',)
     #增加之后变成可修改的

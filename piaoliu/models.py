@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import timedelta
+from piaoliu.notice import have_back_notice,borrow_notice
 
 # Create your models here.
 class Student(models.Model):
@@ -24,22 +25,24 @@ class Book (models.Model):
     #1代表可以外借 0代表已经借出去了
     state = models.IntegerField(default=1)
     def __str__(self):
-        return self.bookName
+        return self.bookName+"  id:"+str(self.id)
+
+    def status(self):
+        if self.state ==1:
+            return "在架"
+        elif self.state ==0:
+            return "已外借"
+        elif self.state ==2:
+            return "被预约中"
+        else:
+            return "错误"
 
     def save(self,*args,**kwargs):
-        old_state = None
-        #记录上一次的state
-        if self.pk is not None:
-            book = Book.objects.get(pk=self.pk)
-            old_state = book.state
         super(Book,self).save(*args,**kwargs)
         #如果不存在对应的isbn，就自动创建一个相对应的
         if not douban.objects.filter(isbn=self.isbn):
             instance = douban.objects.create(isbn=self.isbn,subjectId='12345',recommendBook='baiyexing')
             instance.save()
-        #判断是否有人还书
-        if (old_state== 0 and self.state==1):
-            print ('some one back book , should send a email')
 
 
 class BorrowBook(models.Model):
@@ -52,6 +55,37 @@ class BorrowBook(models.Model):
     #
     def shouldBackDate(self):
         return self.borrowDate +timedelta( days = self.currentBook.length)
+
+    def status(self):
+        if self.actualBackDate ==None:
+            return "未还"
+        else:
+            return "已还"
+
+
+    def save(self,*args,**kwargs):
+        #如果原来acctural date is null 现在不是空 发邮件通知已经还了
+        flag = False
+        if self.pk is None:
+            flag=True
+        else:
+            borrow = BorrowBook.objects.get(pk=self.pk)
+            old_actual_date = borrow.actualBackDate
+            if old_actual_date==None and self.actualBackDate !=None:
+                have_back_notice(borrow)
+                book = self.currentBook
+                book.state = 1
+                book.save()
+
+        # 还是按照原先的方式保存
+        super(BorrowBook, self).save(*args, **kwargs)
+        #如果是首次被建立，发邮件通知借了书，书的状态变为0 ，即已经外借
+        if flag:
+            borrow_notice(self)
+            book = self.currentBook
+            book.state = 0
+            book.save()
+
 
 class douban(models.Model):
     isbn = models.CharField(max_length=30)

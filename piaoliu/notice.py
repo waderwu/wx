@@ -25,23 +25,24 @@ def order_notice(yuyue):
 
 
 def borrow_notice(borrow):
-    user = borrow.currentUSer.user
+    user = borrow.currentUser.user
     name = user.username
     email = user.email
     book = borrow.currentBook
     bookname = book.bookName
-    borrowDate = borrow.borrowDate.strftime()
-    shouldback = borrow.shouldBackDate().strftime()
-    message = '%s同学你好，你在%s借了图书《%s》，最迟需要在%s归还图书' % (name, borrowDate, bookname,shouldback)
+    borrowDate = borrow.borrowDate.strftime('%Y-%m-%d')
+    shouldback = borrow.shouldBackDate().strftime('%Y-%m-%d')
+    message = '%s同学你好，你在%s借了图书《%s》，最迟需要在%s归还图书' % (name, borrowDate,bookname,shouldback)
+    #message = '%s同学你好，你今天借了图书《%s》，最迟需要在30天后归还图书' % (name, bookname)
     send_mail('图书漂流活动——借书通知', message, 'yishuwang2016@163.com',
               [email], fail_silently=False, )
 
 def have_back_notice(borrow):
-    user = borrow.currentUSer.user
+    user = borrow.currentUser.user
     name = user.username
     email = user.email
     book = borrow.currentBook
     bookname = book.bookName
-    message = '%s同学你好，你在借的图书《%s》，已经归还图书' % (name,bookname)
-    send_mail('图书漂流活动——借书通知', message, 'yishuwang2016@163.com',
+    message = '%s同学你好，你在借的图书《%s》，已经归还' % (name,bookname)
+    send_mail('图书漂流活动——还书通知', message, 'yishuwang2016@163.com',
               [email], fail_silently=False, )
