@@ -1,9 +1,26 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import timedelta
-from piaoliu.notice import have_back_notice,borrow_notice
+from piaoliu.notice import have_back_notice,borrow_notice,order_notice
+from piaoliu.spider import get_information_by_isbn
 
 # Create your models here.
+
+class douban(models.Model):
+    bookName = models.CharField(max_length=30)
+    author = models.CharField(max_length=30)
+    isbn = models.CharField(max_length=30)
+    url = models.CharField(max_length=30)
+    rating = models.FloatField()
+    #subjectId = models.CharField(max_length=30,blank=True,null=True)
+    #recommendBook  = models.TextField(max_length=200)
+    # 一本书所花费的时间 类型是整数
+    length = models.IntegerField(default=30,blank=True,null=True)
+    description = models.TextField(max_length=200)
+
+    def __str__(self):
+        return self.isbn
+
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     userid = models.CharField(max_length=30,blank=True,null=True)
@@ -15,17 +32,22 @@ class Student(models.Model):
     def __str__(self):
         return self.user.username
 
+    def email(self):
+        email = self.user.email
+        return email
+
+    def amount(self):
+        amount = self.borrowbook_set.all().count()
+        return amount
+
 
 class Book (models.Model):
-    bookName = models.CharField(max_length=30)
-    #一本书所花费的时间 类型是时间间隔
-    length = models.IntegerField(default=30)
-    description = models.TextField(max_length=200)
     isbn = models.CharField(max_length=30)
     #1代表可以外借 0代表已经借出去了
     state = models.IntegerField(default=1)
+    doubanxinxi =models.ForeignKey(douban,blank=True,null=True)
     def __str__(self):
-        return self.bookName+"  id:"+str(self.id)
+        return self.bookName()+"  id:"+str(self.id)
 
     def status(self):
         if self.state ==1:
@@ -37,12 +59,26 @@ class Book (models.Model):
         else:
             return "错误"
 
+    def bookName(self):
+        return self.doubanxinxi.bookName
+    def length(self):
+        return self.doubanxinxi.length
+
+    def borrowed(self):
+        book = self.borrowbook_set.all()
+        amount = book.count()
+        return amount
+
     def save(self,*args,**kwargs):
         super(Book,self).save(*args,**kwargs)
         #如果不存在对应的isbn，就自动创建一个相对应的
         if not douban.objects.filter(isbn=self.isbn):
-            instance = douban.objects.create(isbn=self.isbn,subjectId='12345',recommendBook='baiyexing')
-            instance.save()
+            (author,bookName,rating,description,url) = get_information_by_isbn(self.isbn)
+            url = url.replace('\\','')
+            instance = douban.objects.create(isbn=self.isbn,author=author,bookName=bookName,rating=rating,description=description,url=url)
+            #创建book时 先选择id为1的doubanxinxi ，然后再改回成实例
+            self.doubanxinxi = instance
+            self.save()
 
 
 class BorrowBook(models.Model):
@@ -54,7 +90,7 @@ class BorrowBook(models.Model):
     actualBackDate = models.DateField(blank = True,null = True)
     #
     def shouldBackDate(self):
-        return self.borrowDate +timedelta( days = self.currentBook.length)
+        return self.borrowDate +timedelta( days = self.currentBook.doubanxinxi.length)
 
     def status(self):
         if self.actualBackDate ==None:
@@ -74,8 +110,16 @@ class BorrowBook(models.Model):
             if old_actual_date==None and self.actualBackDate !=None:
                 have_back_notice(borrow)
                 book = self.currentBook
-                book.state = 1
-                book.save()
+                #处理预约的情况
+                order = orderBook.objects.filter(book=book,noticeState=0).order_by('id')[0]
+                if order :
+                    order_notice(order)
+                    book.state = 2
+                    book.save()
+                else:
+                    book.state = 1
+                    book.save()
+
 
         # 还是按照原先的方式保存
         super(BorrowBook, self).save(*args, **kwargs)
@@ -86,18 +130,19 @@ class BorrowBook(models.Model):
             book.state = 0
             book.save()
 
-
-class douban(models.Model):
-    isbn = models.CharField(max_length=30)
-    subjectId = models.CharField(max_length=30,blank=True,null=True)
-    recommendBook  = models.TextField(max_length=200)
-
 class orderBook(models.Model):
     orderDate = models.DateField(auto_now_add=True)
     book = models.ForeignKey(Book)
     user = models.ForeignKey(Student)
-    # 0代表还没有拿书，1代表已经拿书了
-    state = models.CharField(max_length=10,default=0)
-    #是否已经通知 0 代表未通知 1代表已经通知，2 代表通知了但是未来拿
-    noticeState = models.IntegerField(default=0)
+    # 是否已经通知 0 代表未通知 1代表已经通知，2 代表已经拿书了
+    state = models.IntegerField(default=0)
+    def status(self):
+        if self.state == 0 :
+            return "未通知"
+        elif self.state == 1:
+            return "已通知"
+        elif self.state ==2 :
+            return "已拿书"
+
+
 
