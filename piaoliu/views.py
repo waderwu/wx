@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 #从本目录下导入
 import piaoliu.forms
-from piaoliu.notice import back_notice,order_notice
+from piaoliu.notice import back_notice
 
 # Create your views here.
 
@@ -15,8 +15,8 @@ def index(request):
         form = piaoliu.forms.search_form(request.POST)
         if form.is_valid():
             bookName = form.cleaned_data['keyword']
-            books = Book.objects.filter(bookName=bookName)
-            borrows = BorrowBook.objects.filter(currentBook__bookName=bookName,actualBackDate__isnull=True)
+            books = Book.objects.filter(doubanxinxi__bookName=bookName)
+            borrows = BorrowBook.objects.filter(currentBook__doubanxinxi__bookName__contains=bookName,actualBackDate__isnull=True)
             '''
             for book in books:
                 borrow = book.borrowbook_set.all().filter(actualBackDate='')
@@ -45,11 +45,13 @@ def index(request):
         else:
             return HttpResponseRedirect('/')
     else:
+        onshelfbooks = Book.objects.filter(state=1)
+
         form = piaoliu.forms.search_form()
         return render(request ,'index.html',
     {
-        'welcome':'nihao,i am moban',
         'form':form,
+        'onshelfbooks':onshelfbooks,
     }
                       )
 #出现了no such table

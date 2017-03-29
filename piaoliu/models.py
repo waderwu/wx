@@ -111,9 +111,11 @@ class BorrowBook(models.Model):
                 have_back_notice(borrow)
                 book = self.currentBook
                 #处理预约的情况
-                order = orderBook.objects.filter(book=book,noticeState=0).order_by('id')[0]
+                order = orderBook.objects.filter(book=book,state=0).order_by('id')[0]
                 if order :
                     order_notice(order)
+                    order.state = 1
+                    order.save()
                     book.state = 2
                     book.save()
                 else:
@@ -129,6 +131,11 @@ class BorrowBook(models.Model):
             book = self.currentBook
             book.state = 0
             book.save()
+            #如果已经通知预约了，更改预约状态为2,即已经拿书
+            order = orderBook.objects.filter(book=book,user=self.currentUser,state=1)[0]
+            if order:
+                order.state = 2
+                order.save()
 
 class orderBook(models.Model):
     orderDate = models.DateField(auto_now_add=True)

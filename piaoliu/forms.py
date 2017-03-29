@@ -25,3 +25,13 @@ class RegisterForm(forms.Form):
 
 class search_form(forms.Form):
     keyword = forms.CharField(max_length=50)
+
+
+class sort_form(forms.Form):
+    sort_choices = (
+        ('rating','豆瓣评分'),
+        ('borrowed','被借数量'),
+        ('onshelf','在架的'),
+    )
+    sort_way = forms.ChoiceField(choices=sort_choices)
+

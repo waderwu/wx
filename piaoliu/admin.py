@@ -80,7 +80,7 @@ class doubanAdmin(admin.ModelAdmin):
 admin.site.register(douban,doubanAdmin)
 
 class orderBookAdmin(admin.ModelAdmin):
-    list_display = ('id','user','link_to_user','book','link_to_book','orderDate','state')
+    list_display = ('id','user','link_to_user','book','link_to_book','orderDate','state','status')
     search_fields = ('user__user__username','book__doubanxinxi__bookName')
     list_filter = ('book', 'user',)
 

@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<body>
+<body style="margin-left: 600px;margin-right: 600px;">
 {% if user.is_authenticated %}
 <form id="logoutForm" action="/logout" method="post" >
     {% csrf_token %}
-        <li>您好 {{ user.username }}! <a href="javascript:document.getElementById('logoutForm').submit()">登出</a></li>
+        <p>您好 {{ user.username }}! <a href="javascript:document.getElementById('logoutForm').submit()">登出</a></p>
 
 </form>
 
 {% else %}
-    <li><a href="/login">登录</a><a href="/register">注册</a></li>
+    <p><a href="/login">登录</a><a href="/register">注册</a></p>
 
 {% endif %}
 
@@ -31,7 +31,7 @@
     <ul>
     {%  for book in books%}
         {% if book.state == 1  %}
-            <li>书名：{{  book.bookName }}</li>
+            <li>书名：{{  book.doubanxinxi.bookName }}</li>
             <li>id: {{ book.id }}</li>
             <li>现在可以外借，请携带学生证到电院群楼3-102借阅此书</li>
         {% endif %}
@@ -43,7 +43,7 @@
 {% if borrows %}
     <ul>
    {%  for borrow in borrows%}
-            <li>书名：{{  borrow.currentBook.bookName }}</li>
+            <li>书名：{{  borrow.currentBook.doubanxinxi.bookName }}</li>
             <li>id: {{ borrow.currentBook.id }} </li>
             <li>借书日期: {{ borrow.borrowDate|date:"Y-m-d" }}</li>
             <li>此书已被借，到期时间为: {{ borrow.shouldBackDate|date:"Y-m-d" }}</li>
@@ -52,6 +52,21 @@
     {%  endfor %}
     {% endif %}
     </ul>
+</p>
+
+<p>
+    {% if onshelfbooks %}
+        <h1>可外借的书</h1>
+    {% for book in onshelfbooks %}
+    <li>书名：{{ book.doubanxinxi.bookName }} (id：{{ book.id }})</li>
+    <li>豆瓣评分：{{ book.doubanxinxi.rating }}</li>
+    <li>豆瓣链接：<a href="{{ book.doubanxinxi.url }}">{{ book.doubanxinxi.url }}</a></li>
+
+    <p >简介：{{ book.doubanxinxi.description }}</p>
+        <hr/>
+    {% endfor %}
+    {% endif %}
+
 </p>
 </body>
 </html>
