@@ -5,6 +5,10 @@
     <title>detail</title>
 </head>
 <body>
+{% if user.is_authenticated %}
+<p><h1>您好 {{ user.username }} 这是你的借阅预约信息!</h1></p>
+{% endif %}
+<p>
 <h1>借的书</h1>
 {% if borrowbooks %}
     <ul>
@@ -30,8 +34,9 @@
        {% endif %}
     {%  endfor %}
     {% endif %}
+</p>
+<p>
 <h1>预约的书</h1>
-
 <hr/>
     {% if orderbooks %}
     <ul>
@@ -43,5 +48,6 @@
     {%  endfor %}
     {% endif %}
     </ul>
+</p>
 </body>
 </html>

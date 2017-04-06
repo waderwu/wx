@@ -90,7 +90,7 @@ class orderBookAdmin(admin.ModelAdmin):
 
     def link_to_book(self, obj):
         link = urlresolvers.reverse('admin:piaoliu_book_change', args=[obj.book.id])  # model name has to be lowercase
-        return u'<a href="%s">%s</a>' % (link, obj.book.bookName)
+        return u'<a href="%s">%s</a>' % (link, obj.book.doubanxinxi.bookName)
 
     link_to_book.allow_tags = True
     link_to_user.allow_tags = True

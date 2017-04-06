@@ -1,22 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import timedelta
+from datetime import timedelta,datetime
 from piaoliu.notice import have_back_notice,borrow_notice,order_notice
 from piaoliu.spider import get_information_by_isbn
 
 # Create your models here.
 
 class douban(models.Model):
-    bookName = models.CharField(max_length=30)
-    author = models.CharField(max_length=30)
+    bookName = models.CharField(max_length=100)
+    author = models.CharField(max_length=200)
     isbn = models.CharField(max_length=30)
-    url = models.CharField(max_length=30)
+    url = models.CharField(max_length=200)
     rating = models.FloatField()
     #subjectId = models.CharField(max_length=30,blank=True,null=True)
     #recommendBook  = models.TextField(max_length=200)
     # 一本书所花费的时间 类型是整数
     length = models.IntegerField(default=30,blank=True,null=True)
-    description = models.TextField(max_length=200)
+    description = models.TextField(max_length=2000)
 
     def __str__(self):
         return self.isbn
@@ -35,7 +35,7 @@ class Student(models.Model):
     def email(self):
         email = self.user.email
         return email
-
+#该学生借了多少本书
     def amount(self):
         amount = self.borrowbook_set.all().count()
         return amount
@@ -43,7 +43,7 @@ class Student(models.Model):
 
 class Book (models.Model):
     isbn = models.CharField(max_length=30)
-    #1代表可以外借 0代表已经借出去了
+    #1代表可以外借 0代表已经借出去了 2表示"被预约中"
     state = models.IntegerField(default=1)
     doubanxinxi =models.ForeignKey(douban,blank=True,null=True)
     def __str__(self):
@@ -95,6 +95,8 @@ class BorrowBook(models.Model):
     def status(self):
         if self.actualBackDate ==None:
             return "未还"
+        elif self.shouldBackDate()<datetime.today().date():
+            return "过期未还"
         else:
             return "已还"
 
@@ -111,8 +113,9 @@ class BorrowBook(models.Model):
                 have_back_notice(borrow)
                 book = self.currentBook
                 #处理预约的情况
-                order = orderBook.objects.filter(book=book,state=0).order_by('id')[0]
+                order = orderBook.objects.filter(book=book,state=0).order_by('id')
                 if order :
+                    order = order[0]
                     order_notice(order)
                     order.state = 1
                     order.save()
@@ -132,8 +135,9 @@ class BorrowBook(models.Model):
             book.state = 0
             book.save()
             #如果已经通知预约了，更改预约状态为2,即已经拿书
-            order = orderBook.objects.filter(book=book,user=self.currentUser,state=1)[0]
+            order = orderBook.objects.filter(book=book,user=self.currentUser,state=1)
             if order:
+                order = order[0]
                 order.state = 2
                 order.save()
 

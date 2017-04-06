@@ -114,16 +114,14 @@ def check(request):
     #try:
         token = request.GET['token']
         if token=='laoshijiushiyaojiancha':
-            jieyues = BorrowBook.objects.all()
+            jieyues = BorrowBook.objects.all().filter(actualBackDate__isnull=True)
             for jieyue in jieyues:
                 #type is <class 'datetime.date'> but datetime.today() is <class 'datetime.datetime'>
                 today = datetime.today().date()
                 #dela = jieyue.shouldBackDate()-today
                 #print (type(dela))
-                if (jieyue.shouldBackDate().strftime('%Y-%m-%d')=='2017-04-24'):
+                if (jieyue.shouldBackDate()>today-timedelta(days=3)):
                     back_notice(jieyue)
-                    print ('true')
-                print (jieyue.shouldBackDate().strftime('%Y-%m-%d'))
 
             return HttpResponse('ok')
         return HttpResponse('error')
