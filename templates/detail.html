@@ -1,46 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
+{% block content %}
 <head>
-    <meta charset="UTF-8">
-    <title>detail</title>
-</head>
+ <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <title>图书漂流活动</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
 <body>
-{% if user.is_authenticated %}
-<p><h1>您好 {{ user.username }} 这是你的借阅预约信息!</h1></p>
-{% endif %}
-<p>
-<h1>借的书</h1>
+    <div class="container">
+<ul class="nav nav-tabs">
+  <li ><a href="/">首页</a></li>
+  <li class="active"><a href="/detail">{{ user.username }}借阅信息</a></li>
+</ul>
+
+
 {% if borrowbooks %}
+    <h1><span class="label label-primary">借的书</span></h1>
     <ul>
-    <h2>还未还的书</h2>
+    <h2><span class="label label-primary">还未还的书</span></h2>
    {%  for borrow in borrowbooks%}
-       {% if borrow.status == "未还" %}
-            <li>书名：{{  borrow.currentBook.bookName }}</li>
-            <li>id: {{ borrow.currentBook.id }} </li>
-            <li>借书日期: {{ borrow.borrowDate|date:"Y-m-d" }}</li>
-            <li>到期时间为: {{ borrow.shouldBackDate|date:"Y-m-d" }}</li>
-        <hr/>
+       {% if borrow.status != "已还" %}
+           <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{  borrow.currentBook.doubanxinxi.bookName }}(id: {{ borrow.currentBook.id }} )</h3>
+            </div>
+        <table class="table">
+        <th>借书日期</th><th>到期时间</th>
+        <tr><td>{{ borrow.borrowDate|date:"Y-m-d" }}</td><td>{{ borrow.shouldBackDate|date:"Y-m-d" }}</td></tr>
+    </table>
+</div>
        {% endif %}
     {%  endfor %}
-    <hr/>
-    <h2>已经还的书</h2>
+
+    <h2><span class="label label-primary">已经还的书</span></h2>
     {%  for borrow in borrowbooks%}
        {% if borrow.status == "已还" %}
-            <li>书名：{{  borrow.currentBook.bookName }}</li>
-            <li>id: {{ borrow.currentBook.id }} </li>
-            <li>借书日期: {{ borrow.borrowDate|date:"Y-m-d" }}</li>
-            <li>还书时间: {{ borrow.actualBackDate|date:"Y-m-d" }}</li>
-        <hr/>
+           <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{  borrow.currentBook.doubanxinxi.bookName }}(id: {{ borrow.currentBook.id }} )</h3>
+            </div>
+        <table class="table">
+        <th>借书日期</th><th>还书日期</th>
+        <tr><td>{{ borrow.borrowDate|date:"Y-m-d" }}</td><td>{{ borrow.actualBackDate|date:"Y-m-d" }}</td></tr>
+    </table>
+</div>
        {% endif %}
     {%  endfor %}
     {% endif %}
-</p>
-<p>
-<h1>预约的书</h1>
-<hr/>
+        </ul>
+
     {% if orderbooks %}
+        <h1><span class="label label-primary">预约的书</span></h1>
     <ul>
    {%  for order in orderbooks%}
+
+       <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{  order.book.doubanxinxi.bookName }}(id: {{ order.book.id }} )</h3>
+            </div>
+        <table class="table">
+        <th>预约日期</th><th>状态</th>
+        <tr><td>{{ order.orderDate|date:"Y-m-d" }}</td><td>{{ order.status}}</td></tr>
+    </table>
+</div>
             <li>书名：{{  order.book.doubanxinxi.bookName }}</li>
             <li>id: {{ order.book.id }} </li>
             <li>预约日期: {{ order.orderDate|date:"Y-m-d" }}</li>
@@ -50,4 +86,6 @@
     </ul>
 </p>
 </body>
+
+{% endblock %}
 </html>

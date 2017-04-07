@@ -2,72 +2,115 @@
 <html lang="en">
 {% block content %}
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body style="margin-left: 600px;margin-right: 600px;">
-{% if user.is_authenticated %}
-<form id="logoutForm" action="/logout" method="post" >
-    {% csrf_token %}
-        <p>您好 {{ user.username }}! <a href="javascript:document.getElementById('logoutForm').submit()">登出</a></p>
+ <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
 
-</form>
+    <title>图书漂流活动</title>
 
-{% else %}
-    <p><a href="/login">登录</a><a href="/register">注册</a></p>
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
-{% endif %}
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
 
-<p>
-<form action="" method="post">
-    {% csrf_token %}
-    <label for="keyword" >请输入书名</label>
-    {{ form.keyword}}
-    <input type="submit" value="搜索" />
-</form>
-</p>
+<body>
+    <div class="container">
+
+<!-- 导航栏 -->
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">图书漂流活动</a>
+        </div>
+        <form class="navbar-form navbar-left" role="search" action="" method="post">
+            <div class="form-group">
+               {% csrf_token %}
+                <label for="keyword" >请输入书名</label>
+                {{ form.keyword }}
+            </div>
+            <button type="submit" class="btn btn-default">搜索</button>
+        </form>
+        {% if user.is_authenticated %}
+            <form id="logoutForm" action="/logout" method="post" class="nav navbar-nav navbar-right" >
+                {% csrf_token %}
+                <li><a>您好 {{ user.username }}!</a></li>
+                <li><a href="/detail">借阅信息</a></li>
+                <li><a href="javascript:document.getElementById('logoutForm').submit()">登出</a></li>
+            </form>
+        {% else %}
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="/register"><span class="glyphicon glyphicon-user"></span> 注册</a></li>
+            <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> 登录</a></li>
+        </ul>
+        {% endif %}
+    </div>
+</nav>
+
 <p>
     {% if books %}
-    <ul>
+        <h1><span class="label label-primary">可外借</span></h1>
+        <br/>
     {%  for book in books%}
         {% if book.state == 1  %}
-            <li>书名：{{  book.doubanxinxi.bookName }}</li>
-            <li>id: {{ book.id }}</li>
-            <li>现在可以外借，请携带学生证到电院群楼3-102借阅此书</li>
+<div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{  book.doubanxinxi.bookName }}(id: {{ book.id }})</h3>
+                </div>
+                <div class="panel-body">
+                    现在可以外借，请携带学生证到电院群楼3-102借阅此书
+                </div>
+</div>
         {% endif %}
-        <hr/>
     {%  endfor %}
     {% endif %}
-    </ul>
-{{ warning }}
+
+ {%  if warning %}
+    <div class="alert alert-info">{{ warning }}</div>
+ {% endif %}
+
 {% if borrows %}
-    <ul>
+    <h1><span class="label label-primary">需预约</span></h1>
+    <br/>
    {%  for borrow in borrows%}
-            <li>书名：{{  borrow.currentBook.doubanxinxi.bookName }}</li>
-            <li>id: {{ borrow.currentBook.id }} </li>
-            <li>借书日期: {{ borrow.borrowDate|date:"Y-m-d" }}</li>
-            <li>此书已被借，到期时间为: {{ borrow.shouldBackDate|date:"Y-m-d" }}</li>
-            <li><a href="order/{{ borrow.currentBook.id}}">预约此书</a></li>
-        <hr/>
+       <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{  borrow.currentBook.doubanxinxi.bookName }}(id: {{ borrow.currentBook.id }} )</h3>
+            </div>
+        <table class="table">
+        <th>借书日期</th><th>到期时间</th><th>预约此书</th>
+        <tr><td>{{ borrow.borrowDate|date:"Y-m-d" }}</td><td>{{ borrow.shouldBackDate|date:"Y-m-d" }}</td><td><a href="order/{{ borrow.currentBook.id}}">预约此书</a></td></tr>
+    </table>
+</div>
     {%  endfor %}
     {% endif %}
-    </ul>
-</p>
 
 <p>
     {% if onshelfbooks %}
-        <h1>可外借的书</h1>
+         <h1><span class="label label-primary">可外借的书</span></h1>
+        <br/>
     {% for book in onshelfbooks %}
-    <li>书名：{{ book.doubanxinxi.bookName }} (id：{{ book.id }})</li>
-    <li>豆瓣评分：{{ book.doubanxinxi.rating }}</li>
-    <li>豆瓣链接：<a href="{{ book.doubanxinxi.url }}">{{ book.doubanxinxi.url }}</a></li>
-
-    <p >简介：{{ book.doubanxinxi.description }}</p>
-        <hr/>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ book.doubanxinxi.bookName }} (id：{{ book.id }})</h3>
+            </div>
+            <table class="table">
+                <th>豆瓣评分</th><th>豆瓣链接</th>
+                <tr><td>{{ book.doubanxinxi.rating }}</td><td><a href="{{ book.doubanxinxi.url }}">{{ book.doubanxinxi.url }}</a></td></tr>
+            </table>
+            <div class="panel-body">
+                简介：{{ book.doubanxinxi.description }}
+            </div>
+        </div>
     {% endfor %}
     {% endif %}
-
-</p>
 </body>
+
 </html>
 {% endblock %}

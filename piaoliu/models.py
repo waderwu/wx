@@ -19,7 +19,7 @@ class douban(models.Model):
     description = models.TextField(max_length=2000)
 
     def __str__(self):
-        return self.isbn
+        return self.bookName+self.isbn
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -94,9 +94,10 @@ class BorrowBook(models.Model):
 
     def status(self):
         if self.actualBackDate ==None:
-            return "未还"
-        elif self.shouldBackDate()<datetime.today().date():
-            return "过期未还"
+            if self.shouldBackDate()<datetime.today().date():
+                return "过期未还"
+            else:
+                return "未还"
         else:
             return "已还"
 

@@ -109,7 +109,7 @@ def detail(request):
         orderbooks = orderBook.objects.filter(user=user)
         return render(request,"detail.html",{'borrowbooks':borrowbooks,"orderbooks":orderbooks})
     else:
-        return HttpResponseRedirect('login/')
+        return HttpResponseRedirect('/login')
 def check(request):
     #try:
         token = request.GET['token']
@@ -120,7 +120,7 @@ def check(request):
                 today = datetime.today().date()
                 #dela = jieyue.shouldBackDate()-today
                 #print (type(dela))
-                if (jieyue.shouldBackDate()>today-timedelta(days=3)):
+                if (jieyue.shouldBackDate()< (today+timedelta(days=3))):
                     back_notice(jieyue)
 
             return HttpResponse('ok')
