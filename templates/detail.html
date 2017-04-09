@@ -11,7 +11,8 @@
     <title>图书漂流活动</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!--<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> -->
+     <link href="/static/piaoliu/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -77,10 +78,6 @@
         <tr><td>{{ order.orderDate|date:"Y-m-d" }}</td><td>{{ order.status}}</td></tr>
     </table>
 </div>
-            <li>书名：{{  order.book.doubanxinxi.bookName }}</li>
-            <li>id: {{ order.book.id }} </li>
-            <li>预约日期: {{ order.orderDate|date:"Y-m-d" }}</li>
-        <hr/>
     {%  endfor %}
     {% endif %}
     </ul>

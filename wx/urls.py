@@ -20,6 +20,9 @@ import django.contrib.auth.views
 import piaoliu.views
 import piaoliu.forms
 
+from django.conf.urls.static import static
+from django.conf import settings
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$',piaoliu.views.index),
@@ -45,4 +48,4 @@ urlpatterns = [
                 }
         },
         name='login'),
-]
+]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
